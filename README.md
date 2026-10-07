@@ -46,4 +46,22 @@ Le projet contient actuellement les entités suivantes :
 - Paiement
 - Maintenance
 
+## Configuration de développement
+
+Le projet utilise un profil Spring Boot `dev` avec le fichier
+`application-dev.properties`.
+
+Ce profil contient la configuration utilisée pour l'environnement
+de développement, notamment la connexion à MySQL, JPA/Hibernate
+et le port du serveur.
+
+## Données de démonstration
+
+Un `CommandLineRunner` permet d'insérer automatiquement deux
+véhicules de démonstration dans la base de données lorsque la
+table `vehicule` est vide.
+
+Ces données permettent de tester l'application sans devoir
+ajouter manuellement des véhicules dans la base.
+
 Les associations entre les différentes entités seront ajoutées lors de l'Atelier 2.
