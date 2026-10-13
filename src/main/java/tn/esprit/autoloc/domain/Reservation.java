@@ -1,27 +1,38 @@
 package tn.esprit.autoloc.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import lombok.*;
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "reservation")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Reservation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idReservation;
+    @Setter(AccessLevel.NONE)
+    Long idReservation;
 
-    private LocalDate dateDebut;
-    private LocalDate dateFin;
+    LocalDate dateDebut;
+    LocalDate dateFin;
 
     @Enumerated(EnumType.STRING)
-    private StatutReservation statut;
+    StatutReservation statut;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    Client client;
+    @ManyToOne(fetch = FetchType.LAZY)
+    Vehicule vehicule;
+    @OneToOne(
+            mappedBy = "reservation",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY
+    )
+    Contrat contrat;
 }

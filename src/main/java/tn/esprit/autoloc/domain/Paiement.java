@@ -1,28 +1,33 @@
 package tn.esprit.autoloc.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.math.BigDecimal;
+import lombok.*;
 import java.time.LocalDate;
+import java.math.BigDecimal;
 
 @Entity
+@Table(name = "paiement")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Paiement {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idPaiement;
+    @Setter(AccessLevel.NONE)
+    Long idPaiement;
 
-    private BigDecimal montant;
-    private LocalDate datePaiement;
+    @Column(precision = 10, scale = 2)
+    BigDecimal montant;
+
+    LocalDate datePaiement;
 
     @Enumerated(EnumType.STRING)
-    private ModePaiement modePaiement;
+    ModePaiement modePaiement;
+
+    // Association Paiement vers Contrat
+    @ManyToOne(fetch = FetchType.LAZY)
+    Contrat contrat;
 }
