@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import tn.esprit.autoloc.domain.CategorieVehicule;
 import tn.esprit.autoloc.domain.StatutVehicule;
 import tn.esprit.autoloc.domain.Vehicule;
-import tn.esprit.autoloc.repository.VehiculeRepository;
+import tn.esprit.autoloc.repository.IVehiculeRepository;
 
 import java.math.BigDecimal;
 
@@ -14,10 +14,10 @@ import java.math.BigDecimal;
 public class DataInitializer {
 
     @Bean
-    CommandLineRunner initVehicules(VehiculeRepository vehiculeRepository) {
+    CommandLineRunner initVehicules(IVehiculeRepository IVehiculeRepository) {
         return args -> {
 
-            if (vehiculeRepository.count() == 0) {
+            if (IVehiculeRepository.count() == 0) {
 
                 Vehicule v1 = new Vehicule();
                 v1.setImmatriculation("TU-1234");
@@ -35,8 +35,8 @@ public class DataInitializer {
                 v2.setTarifJournalier(new BigDecimal("100.00"));
                 v2.setStatut(StatutVehicule.DISPONIBLE);
 
-                vehiculeRepository.save(v1);
-                vehiculeRepository.save(v2);
+                IVehiculeRepository.save(v1);
+                IVehiculeRepository.save(v2);
 
                 System.out.println("Véhicules de démonstration ajoutés.");
             }
