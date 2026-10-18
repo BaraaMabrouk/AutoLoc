@@ -1,5 +1,6 @@
 package tn.esprit.autoloc.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -28,6 +29,8 @@ public class Paiement {
     ModePaiement modePaiement;
 
     // Association Paiement vers Contrat
+    @JsonBackReference("contrat-paiements")
     @ManyToOne(fetch = FetchType.LAZY)
-    Contrat contrat;
+    @JoinColumn(name = "contrat_id_contrat")
+    private Contrat contrat;
 }

@@ -1,11 +1,13 @@
 package tn.esprit.autoloc.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "contrat")
@@ -28,6 +30,7 @@ public class Contrat {
 
     Boolean valide;
 
+    @JsonManagedReference("contrat-paiements")
     @OneToMany(
             mappedBy = "contrat",
             cascade = CascadeType.ALL,
@@ -35,6 +38,8 @@ public class Contrat {
             fetch = FetchType.LAZY
     )
     List<Paiement> paiements = new ArrayList<>();
+
+    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     Reservation reservation;
 }

@@ -6,6 +6,8 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "agence")
 @Getter
@@ -28,8 +30,11 @@ public class Agence {
     String telephone;
 
 
+    @JsonIgnore
     @OneToMany(mappedBy = "agence", fetch = FetchType.LAZY)
     List<Vehicule> vehicules = new ArrayList<>();
+
+    @JsonIgnore
     @OneToMany(mappedBy = "agence", fetch = FetchType.LAZY)
     List<Employe> employes = new ArrayList<>();
 }

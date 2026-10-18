@@ -1,5 +1,6 @@
 package tn.esprit.autoloc.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -29,6 +30,7 @@ public class Reservation {
     Client client;
     @ManyToOne(fetch = FetchType.LAZY)
     Vehicule vehicule;
+    @JsonIgnore
     @OneToOne(
             mappedBy = "reservation",
             cascade = CascadeType.ALL,

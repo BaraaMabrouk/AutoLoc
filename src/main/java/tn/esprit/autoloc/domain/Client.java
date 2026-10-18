@@ -5,6 +5,7 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "client")
@@ -35,6 +36,7 @@ public class Client {
     LocalDate dateInscription;
 
 
+    @JsonIgnore
     @OneToMany(
             mappedBy = "client",
             cascade = CascadeType.PERSIST,

@@ -1,5 +1,6 @@
 package tn.esprit.autoloc.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
@@ -54,8 +55,11 @@ public class Vehicule {
             inverseJoinColumns = @JoinColumn(name = "id_equipement")
     )
     Set<Equipement> equipements = new HashSet<>();
+    @JsonIgnore
     @OneToMany(mappedBy = "vehicule", fetch = FetchType.LAZY)
     List<Reservation> reservations = new ArrayList<>();
+
+    @JsonIgnore
     @OneToMany(
             mappedBy = "vehicule",
             cascade = CascadeType.PERSIST,

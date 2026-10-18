@@ -1,4 +1,5 @@
 package tn.esprit.autoloc.service;
+import tn.esprit.autoloc.domain.Paiement;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class ContratServiceImpl implements IContratService {
         }
     }
 
+
     @Override
     public Contrat create(Contrat contrat) {
         if (contrat.getIdContrat() != null) {
@@ -29,8 +31,16 @@ public class ContratServiceImpl implements IContratService {
         }
 
         valider(contrat);
+
+        if (contrat.getPaiements() != null) {
+            for (Paiement paiement : contrat.getPaiements()) {
+                paiement.setContrat(contrat);
+            }
+        }
+
         return contratRepository.save(contrat);
     }
+
 
     @Override
     public Contrat findById(Long id) {
