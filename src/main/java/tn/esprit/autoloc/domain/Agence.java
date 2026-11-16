@@ -30,7 +30,6 @@ public class Agence {
     String telephone;
 
 
-    @JsonIgnore
     @OneToMany(mappedBy = "agence", fetch = FetchType.LAZY)
     List<Vehicule> vehicules = new ArrayList<>();
 

@@ -1,17 +1,23 @@
-
 package tn.esprit.autoloc.web.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import tn.esprit.autoloc.domain.Maintenance;
+
 import tn.esprit.autoloc.service.IMaintenanceService;
+import tn.esprit.autoloc.web.dto.MaintenanceDTO;
 
 import java.util.List;
+
+import jakarta.validation.Valid;
+import tn.esprit.autoloc.web.dto.AffectationMaintenanceDTO;
 
 @RestController
 @RequestMapping("/maintenances")
@@ -24,7 +30,7 @@ public class MaintenanceController {
     @Operation(summary = "Afficher toutes les maintenances")
     @ApiResponse(responseCode = "200", description = "Liste des maintenances récupérée")
     @GetMapping
-    public List<Maintenance> findAll() {
+    public List<MaintenanceDTO> findAll() {
         return maintenanceService.findAll();
     }
 
@@ -32,9 +38,10 @@ public class MaintenanceController {
     @ApiResponse(responseCode = "200", description = "Maintenance trouvée")
     @ApiResponse(responseCode = "404", description = "Maintenance introuvable")
     @GetMapping("/{id}")
-    public Maintenance findById(
+    public MaintenanceDTO findById(
             @Parameter(description = "Identifiant de la maintenance", required = true)
             @PathVariable Long id) {
+
         return maintenanceService.findById(id);
     }
 
@@ -43,8 +50,10 @@ public class MaintenanceController {
     @ApiResponse(responseCode = "400", description = "Données invalides")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Maintenance create(@RequestBody Maintenance maintenance) {
-        return maintenanceService.create(maintenance);
+    public MaintenanceDTO create(
+            @Valid @RequestBody MaintenanceDTO dto) {
+
+        return maintenanceService.create(dto);
     }
 
     @Operation(summary = "Modifier une maintenance")
@@ -52,11 +61,12 @@ public class MaintenanceController {
     @ApiResponse(responseCode = "400", description = "Données invalides")
     @ApiResponse(responseCode = "404", description = "Maintenance introuvable")
     @PutMapping("/{id}")
-    public Maintenance update(
+    public MaintenanceDTO update(
             @Parameter(description = "Identifiant de la maintenance", required = true)
             @PathVariable Long id,
-            @RequestBody Maintenance maintenance) {
-        return maintenanceService.update(id, maintenance);
+            @Valid @RequestBody MaintenanceDTO dto) {
+
+        return maintenanceService.update(id, dto);
     }
 
     @Operation(summary = "Supprimer une maintenance")
@@ -67,6 +77,34 @@ public class MaintenanceController {
     public void deleteById(
             @Parameter(description = "Identifiant de la maintenance", required = true)
             @PathVariable Long id) {
+
         maintenanceService.deleteById(id);
     }
+
+    @Operation(
+            summary = "Affecter une maintenance à un véhicule"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Maintenance affectée au véhicule"
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "Identifiant du véhicule invalide"
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "Maintenance ou véhicule introuvable"
+    )
+    @PutMapping("/{idMaintenance}/vehicule")
+    public MaintenanceDTO affecterMaintenanceVehicule(
+            @PathVariable Long idMaintenance,
+            @Valid @RequestBody AffectationMaintenanceDTO dto) {
+
+        return maintenanceService.affecterMaintenanceVehicule(
+                idMaintenance,
+                dto
+        );
+    }
+
 }

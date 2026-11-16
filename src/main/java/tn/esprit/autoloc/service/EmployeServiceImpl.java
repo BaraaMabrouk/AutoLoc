@@ -1,60 +1,128 @@
+
 package tn.esprit.autoloc.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import tn.esprit.autoloc.domain.Agence;
 import tn.esprit.autoloc.domain.Employe;
 import tn.esprit.autoloc.exception.ResourceNotFoundException;
+import tn.esprit.autoloc.mapper.EmployeMapper;
+import tn.esprit.autoloc.repository.IAgenceRepository;
 import tn.esprit.autoloc.repository.IEmployeRepository;
+import tn.esprit.autoloc.web.dto.EmployeDTO;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class EmployeServiceImpl implements IEmployeService {
 
     private final IEmployeRepository employeRepository;
+    private final IAgenceRepository agenceRepository;
+    private final EmployeMapper employeMapper;
 
+    // VALIDATION METIER EXISTANTE
     private void valider(Employe employe) {
-        if (employe.getNom() == null || employe.getNom().isBlank()) {
-            throw new IllegalArgumentException("Le nom est obligatoire");
+
+        if (employe.getNom() == null
+                || employe.getNom().isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "Le nom est obligatoire"
+            );
         }
     }
 
+    // CREATE
     @Override
-    public Employe create(Employe employe) {
-        if (employe.getIdEmploye() != null) {
-            throw new IllegalArgumentException("L'identifiant doit être nul");
+    public EmployeDTO create(EmployeDTO dto) {
+
+        if (dto.idEmploye() != null) {
+            throw new IllegalArgumentException(
+                    "L'identifiant doit être nul"
+            );
         }
 
-        valider(employe);
-        return employeRepository.save(employe);
-    }
+        Employe employe = employeMapper.toEntity(dto);
 
-    @Override
-    public Employe findById(Long id) {
-        return employeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Employe", id));
-    }
-
-    @Override
-    public List<Employe> findAll() {
-        return employeRepository.findAll();
-    }
-
-    @Override
-    public Employe update(Long id, Employe employe) {
-        Employe existant = findById(id);
         valider(employe);
 
-        existant.setNom(employe.getNom());
-        existant.setPrenom(employe.getPrenom());
-        existant.setRole(employe.getRole());
+        // Association Employe -> Agence
+        Agence agence = agenceRepository.findById(dto.idAgence())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Agence", dto.idAgence()
+                        )
+                );
 
-        return employeRepository.save(existant);
+        employe.setAgence(agence);
+
+        Employe nouvelEmploye = employeRepository.save(employe);
+
+        return employeMapper.toDTO(nouvelEmploye);
     }
 
+    // GET BY ID
+    @Override
+    @Transactional(readOnly = true)
+    public EmployeDTO findById(Long id) {
+
+        Employe employe = employeRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Employe", id)
+                );
+
+        return employeMapper.toDTO(employe);
+    }
+
+    // GET ALL
+    @Override
+    @Transactional(readOnly = true)
+    public List<EmployeDTO> findAll() {
+
+        return employeRepository.findAll()
+                .stream()
+                .map(employeMapper::toDTO)
+                .toList();
+    }
+
+    // UPDATE
+    @Override
+    public EmployeDTO update(Long id, EmployeDTO dto) {
+
+        Employe existant = employeRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Employe", id)
+                );
+
+        existant.setNom(dto.nom());
+        existant.setPrenom(dto.prenom());
+        existant.setRole(dto.role());
+
+        valider(existant);
+
+        // Mise à jour de l'agence
+        Agence agence = agenceRepository.findById(dto.idAgence())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Agence", dto.idAgence()
+                        )
+                );
+
+        existant.setAgence(agence);
+
+        Employe employeModifie = employeRepository.save(existant);
+
+        return employeMapper.toDTO(employeModifie);
+    }
+
+    // DELETE
     @Override
     public void deleteById(Long id) {
+
         if (!employeRepository.existsById(id)) {
             throw new ResourceNotFoundException("Employe", id);
         }
