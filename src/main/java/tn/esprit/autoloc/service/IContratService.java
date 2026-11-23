@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface IContratService {
 
+    List<ContratDTO> findByVehiculeId(Long keyword);
+
     ContratDTO create(ContratDTO dto);
 
     ContratDTO findById(Long id);

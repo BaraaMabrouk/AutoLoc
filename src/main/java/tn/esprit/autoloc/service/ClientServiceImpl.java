@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import tn.esprit.autoloc.domain.Client;
 import tn.esprit.autoloc.exception.ResourceNotFoundException;
-import tn.esprit.autoloc.mapper.ClientMapper;
+import tn.esprit.autoloc.mapper.IMapper;
 import tn.esprit.autoloc.repository.IClientRepository;
 import tn.esprit.autoloc.web.dto.ClientDTO;
 
@@ -19,7 +19,7 @@ import java.util.List;
 public class ClientServiceImpl implements IClientService {
 
     private final IClientRepository clientRepository;
-    private final ClientMapper clientMapper;
+    private final IMapper mapper;
 
     // VALIDATION METIER EXISTANTE
     private void valider(Client client) {
@@ -43,13 +43,13 @@ public class ClientServiceImpl implements IClientService {
             );
         }
 
-        Client client = clientMapper.toEntity(dto);
+        Client client = mapper.toEntity(dto);
 
         valider(client);
 
         Client nouveauClient = clientRepository.save(client);
 
-        return clientMapper.toDTO(nouveauClient);
+        return mapper.toDTO(nouveauClient);
     }
 
     // GET BY ID
@@ -62,7 +62,7 @@ public class ClientServiceImpl implements IClientService {
                         new ResourceNotFoundException("Client", id)
                 );
 
-        return clientMapper.toDTO(client);
+        return mapper.toDTO(client);
     }
 
     // GET ALL
@@ -72,7 +72,7 @@ public class ClientServiceImpl implements IClientService {
 
         return clientRepository.findAll()
                 .stream()
-                .map(clientMapper::toDTO)
+                .map(mapper::toDTO)
                 .toList();
     }
 
@@ -96,7 +96,7 @@ public class ClientServiceImpl implements IClientService {
 
         Client clientModifie = clientRepository.save(existant);
 
-        return clientMapper.toDTO(clientModifie);
+        return mapper.toDTO(clientModifie);
     }
 
     // DELETE

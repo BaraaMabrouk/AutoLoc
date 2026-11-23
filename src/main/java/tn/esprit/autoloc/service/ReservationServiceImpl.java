@@ -10,8 +10,7 @@ import tn.esprit.autoloc.domain.Reservation;
 import tn.esprit.autoloc.domain.Vehicule;
 
 import tn.esprit.autoloc.exception.ResourceNotFoundException;
-
-import tn.esprit.autoloc.mapper.ReservationMapper;
+import tn.esprit.autoloc.mapper.IMapper;
 
 import tn.esprit.autoloc.repository.IClientRepository;
 import tn.esprit.autoloc.repository.IReservationRepository;
@@ -29,7 +28,7 @@ public class ReservationServiceImpl implements IReservationService {
     private final IReservationRepository reservationRepository;
     private final IClientRepository clientRepository;
     private final IVehiculeRepository vehiculeRepository;
-    private final ReservationMapper reservationMapper;
+    private final IMapper mapper;
 
     // VALIDATION METIER EXISTANTE
     private void valider(Reservation reservation) {
@@ -55,7 +54,7 @@ public class ReservationServiceImpl implements IReservationService {
             );
         }
 
-        Reservation reservation = reservationMapper.toEntity(dto);
+        Reservation reservation = mapper.toEntity(dto);
 
         valider(reservation);
 
@@ -82,7 +81,7 @@ public class ReservationServiceImpl implements IReservationService {
         Reservation nouvelleReservation =
                 reservationRepository.save(reservation);
 
-        return reservationMapper.toDTO(nouvelleReservation);
+        return mapper.toDTO(nouvelleReservation);
     }
 
     // GET BY ID
@@ -95,7 +94,7 @@ public class ReservationServiceImpl implements IReservationService {
                         new ResourceNotFoundException("Reservation", id)
                 );
 
-        return reservationMapper.toDTO(reservation);
+        return mapper.toDTO(reservation);
     }
 
     // GET ALL
@@ -105,7 +104,7 @@ public class ReservationServiceImpl implements IReservationService {
 
         return reservationRepository.findAll()
                 .stream()
-                .map(reservationMapper::toDTO)
+                .map(mapper::toDTO)
                 .toList();
     }
 
@@ -147,7 +146,7 @@ public class ReservationServiceImpl implements IReservationService {
         Reservation reservationModifiee =
                 reservationRepository.save(existante);
 
-        return reservationMapper.toDTO(reservationModifiee);
+        return mapper.toDTO(reservationModifiee);
     }
 
     // DELETE

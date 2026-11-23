@@ -5,13 +5,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.validation.Valid;
-import tn.esprit.autoloc.web.dto.AffectationEquipementDTO;
-import tn.esprit.autoloc.web.dto.AffectationEquipementResponseDTO;
+import jakarta.validation.constraints.Positive;
 
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import tn.esprit.autoloc.service.IVehiculeService;
@@ -22,6 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/vehicules")
 @RequiredArgsConstructor
+@Validated
 @Tag(
         name = "Véhicules",
         description = "Gestion des véhicules de location"
@@ -89,7 +91,7 @@ public class VehiculeController {
         vehiculeService.deleteById(id);
     }
 
-    // AFFECTATION VEHICULE → AGENCE
+    // AFFECTATION VEHICULE -> AGENCE
     @Operation(summary = "Affecter un véhicule à une agence")
     @ApiResponse(responseCode = "200", description = "Véhicule affecté à l'agence")
     @ApiResponse(responseCode = "404", description = "Véhicule ou agence introuvable")
@@ -104,30 +106,42 @@ public class VehiculeController {
         );
     }
 
-    @Operation(
-            summary = "Affecter un équipement à un véhicule"
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "Équipement affecté au véhicule"
-    )
-    @ApiResponse(
-            responseCode = "400",
-            description = "Identifiant de l'équipement invalide"
-    )
-    @ApiResponse(
-            responseCode = "404",
-            description = "Véhicule ou équipement introuvable"
-    )
-    @PutMapping("/{idVehicule}/equipements")
-    public AffectationEquipementResponseDTO affecterVehiculeEquipement(
-            @PathVariable Long idVehicule,
-            @Valid @RequestBody AffectationEquipementDTO dto) {
+
+    @Operation(summary = "Affecter un équipement à un véhicule")
+    @ApiResponse(responseCode = "200", description = "Équipement affecté au véhicule")
+    @ApiResponse(responseCode = "400", description = "Identifiant invalide")
+    @ApiResponse(responseCode = "404", description = "Véhicule ou équipement introuvable")
+    @PostMapping("/{idVehicule}/equipements/{idEquipement}")
+    public VehiculeDTO affecterVehiculeEquipement(
+            @PathVariable
+            @Positive(message = "L'identifiant du véhicule doit être positif")
+            Long idVehicule,
+
+            @PathVariable
+            @Positive(message = "L'identifiant de l'équipement doit être positif")
+            Long idEquipement) {
 
         return vehiculeService.affecterVehiculeEquipement(
                 idVehicule,
-                dto
+                idEquipement
         );
     }
+    @GetMapping("/contrat/{keyword}")
+    public List<VehiculeDTO> getVehiculesByContrat(
+            @PathVariable Long keyword) {
+
+        return vehiculeService.findByContratId(keyword);
+    }
+
+
+    @Operation(summary = "Afficher les véhicules par ID Maintenance")
+    @ApiResponse(responseCode = "200", description = "Liste des véhicules récupérée")
+    @GetMapping("/maintenance/{keyword}")
+    public List<VehiculeDTO> getVehiculesByMaintenance(
+            @PathVariable Long keyword) {
+
+        return vehiculeService.findByMaintenanceId(keyword);
+    }
+
 
 }

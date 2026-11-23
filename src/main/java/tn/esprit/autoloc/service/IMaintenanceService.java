@@ -1,12 +1,12 @@
 
 package tn.esprit.autoloc.service;
 
-import tn.esprit.autoloc.web.dto.AffectationMaintenanceDTO;
 import tn.esprit.autoloc.web.dto.MaintenanceDTO;
-
 import java.util.List;
 
 public interface IMaintenanceService {
+
+    List<MaintenanceDTO> findByVehiculeId(Long keyword);
 
     MaintenanceDTO create(MaintenanceDTO dto);
 
@@ -18,9 +18,9 @@ public interface IMaintenanceService {
 
     void deleteById(Long id);
 
-    // Nouvelle méthode d'affectation
+    // Affecter une maintenance à un véhicule
     MaintenanceDTO affecterMaintenanceVehicule(
             Long idMaintenance,
-            AffectationMaintenanceDTO dto
+            Long idVehicule
     );
 }

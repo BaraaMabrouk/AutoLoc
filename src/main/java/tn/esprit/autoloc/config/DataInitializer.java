@@ -1,5 +1,7 @@
+
 package tn.esprit.autoloc.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,14 +12,15 @@ import tn.esprit.autoloc.repository.IVehiculeRepository;
 
 import java.math.BigDecimal;
 
+@Slf4j
 @Configuration
 public class DataInitializer {
 
     @Bean
-    CommandLineRunner initVehicules(IVehiculeRepository IVehiculeRepository) {
+    CommandLineRunner initVehicules(IVehiculeRepository vehiculeRepository) {
         return args -> {
 
-            if (IVehiculeRepository.count() == 0) {
+            if (vehiculeRepository.count() == 0) {
 
                 Vehicule v1 = new Vehicule();
                 v1.setImmatriculation("TU-1234");
@@ -35,10 +38,10 @@ public class DataInitializer {
                 v2.setTarifJournalier(new BigDecimal("100.00"));
                 v2.setStatut(StatutVehicule.DISPONIBLE);
 
-                IVehiculeRepository.save(v1);
-                IVehiculeRepository.save(v2);
+                vehiculeRepository.save(v1);
+                vehiculeRepository.save(v2);
 
-                System.out.println("Véhicules de démonstration ajoutés.");
+                log.info("Véhicules de démonstration ajoutés.");
             }
         };
     }

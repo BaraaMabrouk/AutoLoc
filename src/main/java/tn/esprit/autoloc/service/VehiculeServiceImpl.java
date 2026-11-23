@@ -7,16 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import tn.esprit.autoloc.domain.Agence;
 import tn.esprit.autoloc.domain.Vehicule;
+import tn.esprit.autoloc.domain.Equipement;
 import tn.esprit.autoloc.exception.ResourceNotFoundException;
-import tn.esprit.autoloc.mapper.VehiculeMapper;
+import tn.esprit.autoloc.mapper.IMapper;
 import tn.esprit.autoloc.repository.IAgenceRepository;
 import tn.esprit.autoloc.repository.IVehiculeRepository;
-import tn.esprit.autoloc.web.dto.VehiculeDTO;
-import tn.esprit.autoloc.domain.Equipement;
 import tn.esprit.autoloc.repository.IEquipementRepository;
-import tn.esprit.autoloc.web.dto.AffectationEquipementDTO;
-import tn.esprit.autoloc.web.dto.AffectationEquipementResponseDTO;
-import java.util.stream.Collectors;
+import tn.esprit.autoloc.web.dto.VehiculeDTO;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,9 +23,12 @@ import java.util.List;
 @Transactional
 public class VehiculeServiceImpl implements IVehiculeService {
 
+    private static final String VEHICULE = "Vehicule";
+    private static final String AGENCE = "Agence";
+
     private final IVehiculeRepository vehiculeRepository;
     private final IAgenceRepository agenceRepository;
-    private final VehiculeMapper vehiculeMapper;
+    private final IMapper mapper;
     private final IEquipementRepository equipementRepository;
 
     // Validation métier existante
@@ -53,17 +53,16 @@ public class VehiculeServiceImpl implements IVehiculeService {
             );
         }
 
-        Vehicule vehicule = vehiculeMapper.toEntity(dto);
+        Vehicule vehicule = mapper.toEntity(dto);
 
         valider(vehicule);
 
-        // Associer une agence si son identifiant est fourni
         if (dto.idAgence() != null) {
 
             Agence agence = agenceRepository.findById(dto.idAgence())
                     .orElseThrow(() ->
                             new ResourceNotFoundException(
-                                    "Agence", dto.idAgence()
+                                    AGENCE, dto.idAgence()
                             )
                     );
 
@@ -72,7 +71,7 @@ public class VehiculeServiceImpl implements IVehiculeService {
 
         Vehicule nouveauVehicule = vehiculeRepository.save(vehicule);
 
-        return vehiculeMapper.toDTO(nouveauVehicule);
+        return mapper.toDTO(nouveauVehicule);
     }
 
     // GET BY ID
@@ -82,10 +81,10 @@ public class VehiculeServiceImpl implements IVehiculeService {
 
         Vehicule vehicule = vehiculeRepository.findById(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Vehicule", id)
+                        new ResourceNotFoundException(VEHICULE, id)
                 );
 
-        return vehiculeMapper.toDTO(vehicule);
+        return mapper.toDTO(vehicule);
     }
 
     // GET ALL
@@ -95,7 +94,7 @@ public class VehiculeServiceImpl implements IVehiculeService {
 
         return vehiculeRepository.findAll()
                 .stream()
-                .map(vehiculeMapper::toDTO)
+                .map(mapper::toDTO)
                 .toList();
     }
 
@@ -105,10 +104,10 @@ public class VehiculeServiceImpl implements IVehiculeService {
 
         Vehicule existant = vehiculeRepository.findById(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Vehicule", id)
+                        new ResourceNotFoundException(VEHICULE, id)
                 );
 
-        Vehicule donnees = vehiculeMapper.toEntity(dto);
+        Vehicule donnees = mapper.toEntity(dto);
 
         valider(donnees);
 
@@ -119,13 +118,12 @@ public class VehiculeServiceImpl implements IVehiculeService {
         existant.setTarifJournalier(donnees.getTarifJournalier());
         existant.setStatut(donnees.getStatut());
 
-        // Mettre à jour l'agence si un identifiant est fourni
         if (dto.idAgence() != null) {
 
             Agence agence = agenceRepository.findById(dto.idAgence())
                     .orElseThrow(() ->
                             new ResourceNotFoundException(
-                                    "Agence", dto.idAgence()
+                                    AGENCE, dto.idAgence()
                             )
                     );
 
@@ -134,7 +132,7 @@ public class VehiculeServiceImpl implements IVehiculeService {
 
         Vehicule vehiculeModifie = vehiculeRepository.save(existant);
 
-        return vehiculeMapper.toDTO(vehiculeModifie);
+        return mapper.toDTO(vehiculeModifie);
     }
 
     // DELETE
@@ -142,13 +140,13 @@ public class VehiculeServiceImpl implements IVehiculeService {
     public void deleteById(Long id) {
 
         if (!vehiculeRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Vehicule", id);
+            throw new ResourceNotFoundException(VEHICULE, id);
         }
 
         vehiculeRepository.deleteById(id);
     }
 
-    // AFFECTATION VEHICULE → AGENCE
+    // AFFECTATION VEHICULE -> AGENCE
     @Override
     public VehiculeDTO affecterVehiculeAgence(
             Long idVehicule,
@@ -164,7 +162,7 @@ public class VehiculeServiceImpl implements IVehiculeService {
         Agence agence = agenceRepository.findById(idAgence)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Agence", idAgence
+                                AGENCE, idAgence
                         )
                 );
 
@@ -172,50 +170,57 @@ public class VehiculeServiceImpl implements IVehiculeService {
 
         Vehicule vehiculeModifie = vehiculeRepository.save(vehicule);
 
-        return vehiculeMapper.toDTO(vehiculeModifie);
+        return mapper.toDTO(vehiculeModifie);
     }
 
+    // AFFECTATION VEHICULE -> EQUIPEMENT
     @Override
-    public AffectationEquipementResponseDTO affecterVehiculeEquipement(
+    public VehiculeDTO affecterVehiculeEquipement(
             Long idVehicule,
-            AffectationEquipementDTO dto) {
+            Long idEquipement) {
 
-        // 1. Rechercher le véhicule
         Vehicule vehicule = vehiculeRepository.findById(idVehicule)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Vehicule", idVehicule
+                                VEHICULE, idVehicule
                         )
                 );
 
-        // 2. Rechercher l'équipement
         Equipement equipement = equipementRepository
-                .findById(dto.idEquipement())
+                .findById(idEquipement)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Equipement", dto.idEquipement()
+                                "Equipement", idEquipement
                         )
                 );
 
-        // 3. Affecter l'équipement au véhicule
         vehicule.getEquipements().add(equipement);
 
-        // 4. Enregistrer l'association ManyToMany
         Vehicule vehiculeModifie =
                 vehiculeRepository.save(vehicule);
 
-        // 5. Récupérer les identifiants des équipements
-        java.util.Set<Long> idEquipements =
-                vehiculeModifie.getEquipements()
-                        .stream()
-                        .map(Equipement::getIdEquipement)
-                        .collect(Collectors.toSet());
-
-        // 6. Retourner le DTO
-        return new AffectationEquipementResponseDTO(
-                vehiculeModifie.getIdVehicule(),
-                idEquipements
-        );
+        return mapper.toDTO(vehiculeModifie);
     }
 
+    // ATELIER 7 : VEHICULES PAR ID CONTRAT
+    @Override
+    @Transactional(readOnly = true)
+    public List<VehiculeDTO> findByContratId(Long keyword) {
+
+        return vehiculeRepository.findByReservationsContratIdContrat(keyword)
+                .stream()
+                .map(mapper::toDTO)
+                .toList();
+    }
+
+    // ATELIER 7 : VEHICULES PAR ID MAINTENANCE
+    @Override
+    @Transactional(readOnly = true)
+    public List<VehiculeDTO> findByMaintenanceId(Long keyword) {
+
+        return vehiculeRepository.findByMaintenancesIdMaintenance(keyword)
+                .stream()
+                .map(mapper::toDTO)
+                .toList();
+    }
 }

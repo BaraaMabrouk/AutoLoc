@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import tn.esprit.autoloc.domain.Paiement;
 import tn.esprit.autoloc.exception.ResourceNotFoundException;
-import tn.esprit.autoloc.mapper.PaiementMapper;
+import tn.esprit.autoloc.mapper.IMapper;
 import tn.esprit.autoloc.repository.IPaiementRepository;
 import tn.esprit.autoloc.web.dto.PaiementDTO;
 
@@ -19,7 +19,7 @@ import java.util.List;
 public class PaiementServiceImpl implements IPaiementService {
 
     private final IPaiementRepository paiementRepository;
-    private final PaiementMapper paiementMapper;
+    private final IMapper mapper;
 
     // GET BY ID
     @Override
@@ -30,7 +30,7 @@ public class PaiementServiceImpl implements IPaiementService {
                         new ResourceNotFoundException("Paiement", id)
                 );
 
-        return paiementMapper.toDTO(paiement);
+        return mapper.toDTO(paiement);
     }
 
     // GET ALL
@@ -39,7 +39,7 @@ public class PaiementServiceImpl implements IPaiementService {
 
         return paiementRepository.findAll()
                 .stream()
-                .map(paiementMapper::toDTO)
+                .map(mapper::toDTO)
                 .toList();
     }
 }

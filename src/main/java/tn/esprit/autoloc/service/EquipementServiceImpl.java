@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import tn.esprit.autoloc.domain.Equipement;
 import tn.esprit.autoloc.exception.ResourceNotFoundException;
-import tn.esprit.autoloc.mapper.EquipementMapper;
+import tn.esprit.autoloc.mapper.IMapper;
 import tn.esprit.autoloc.repository.IEquipementRepository;
 import tn.esprit.autoloc.web.dto.EquipementDTO;
 
@@ -19,7 +19,7 @@ import java.util.List;
 public class EquipementServiceImpl implements IEquipementService {
 
     private final IEquipementRepository equipementRepository;
-    private final EquipementMapper equipementMapper;
+    private final IMapper mapper;
 
     // VALIDATION METIER EXISTANTE
     private void valider(Equipement equipement) {
@@ -43,14 +43,14 @@ public class EquipementServiceImpl implements IEquipementService {
             );
         }
 
-        Equipement equipement = equipementMapper.toEntity(dto);
+        Equipement equipement = mapper.toEntity(dto);
 
         valider(equipement);
 
         Equipement nouvelEquipement =
                 equipementRepository.save(equipement);
 
-        return equipementMapper.toDTO(nouvelEquipement);
+        return mapper.toDTO(nouvelEquipement);
     }
 
     // GET BY ID
@@ -63,7 +63,7 @@ public class EquipementServiceImpl implements IEquipementService {
                         new ResourceNotFoundException("Equipement", id)
                 );
 
-        return equipementMapper.toDTO(equipement);
+        return mapper.toDTO(equipement);
     }
 
     // GET ALL
@@ -73,7 +73,7 @@ public class EquipementServiceImpl implements IEquipementService {
 
         return equipementRepository.findAll()
                 .stream()
-                .map(equipementMapper::toDTO)
+                .map(mapper::toDTO)
                 .toList();
     }
 
@@ -93,7 +93,7 @@ public class EquipementServiceImpl implements IEquipementService {
         Equipement equipementModifie =
                 equipementRepository.save(existant);
 
-        return equipementMapper.toDTO(equipementModifie);
+        return mapper.toDTO(equipementModifie);
     }
 
     // DELETE

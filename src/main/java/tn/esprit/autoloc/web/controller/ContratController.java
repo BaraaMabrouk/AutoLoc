@@ -99,4 +99,13 @@ public class ContratController {
 
         contratService.deleteById(id);
     }
+
+
+    @GetMapping("/vehicule/{keyword}")
+    public List<ContratDTO> getContratsByVehicule(
+            @PathVariable Long keyword) {
+
+        return contratService.findByVehiculeId(keyword);
+    }
+
 }

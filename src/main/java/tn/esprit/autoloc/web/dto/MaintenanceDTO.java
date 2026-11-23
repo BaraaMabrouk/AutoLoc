@@ -1,10 +1,7 @@
+
 package tn.esprit.autoloc.web.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.AssertTrue;
-
+import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 
 public record MaintenanceDTO(
@@ -20,10 +17,19 @@ public record MaintenanceDTO(
         @NotBlank(message = "La description est obligatoire")
         String description,
 
-        @Positive(message = "L'identifiant du véhicule doit être positif")
+        @NotNull(
+                groups = Affectation.class,
+                message = "L'identifiant du véhicule est obligatoire"
+        )
+        @Positive(
+                message = "L'identifiant du véhicule doit être positif",
+                groups = {jakarta.validation.groups.Default.class, Affectation.class}
+        )
         Long idVehicule
 
 ) {
+    public interface Affectation {}
+
     @AssertTrue(message = "La date de fin doit être postérieure ou égale à la date de début")
     public boolean isDatesValides() {
         return dateDebut == null

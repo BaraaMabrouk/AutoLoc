@@ -1,3 +1,4 @@
+
 package tn.esprit.autoloc.web.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -6,9 +7,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import tn.esprit.autoloc.service.IMaintenanceService;
@@ -16,12 +20,10 @@ import tn.esprit.autoloc.web.dto.MaintenanceDTO;
 
 import java.util.List;
 
-import jakarta.validation.Valid;
-import tn.esprit.autoloc.web.dto.AffectationMaintenanceDTO;
-
 @RestController
 @RequestMapping("/maintenances")
 @RequiredArgsConstructor
+@Validated
 @Tag(name = "Maintenances", description = "Gestion des opérations de maintenance")
 public class MaintenanceController {
 
@@ -81,30 +83,31 @@ public class MaintenanceController {
         maintenanceService.deleteById(id);
     }
 
-    @Operation(
-            summary = "Affecter une maintenance à un véhicule"
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "Maintenance affectée au véhicule"
-    )
-    @ApiResponse(
-            responseCode = "400",
-            description = "Identifiant du véhicule invalide"
-    )
-    @ApiResponse(
-            responseCode = "404",
-            description = "Maintenance ou véhicule introuvable"
-    )
-    @PutMapping("/{idMaintenance}/vehicule")
+
+    @Operation(summary = "Affecter une maintenance à un véhicule")
+    @ApiResponse(responseCode = "200", description = "Maintenance affectée au véhicule")
+    @ApiResponse(responseCode = "400", description = "Identifiant invalide")
+    @ApiResponse(responseCode = "404", description = "Maintenance ou véhicule introuvable")
+    @PostMapping("/{idMaintenance}/vehicule/{idVehicule}")
     public MaintenanceDTO affecterMaintenanceVehicule(
-            @PathVariable Long idMaintenance,
-            @Valid @RequestBody AffectationMaintenanceDTO dto) {
+            @PathVariable @Positive(message = "L'identifiant de la maintenance doit être positif")
+            Long idMaintenance,
+            @PathVariable @Positive(message = "L'identifiant du véhicule doit être positif")
+            Long idVehicule) {
 
         return maintenanceService.affecterMaintenanceVehicule(
                 idMaintenance,
-                dto
+                idVehicule
         );
     }
+
+
+    @GetMapping("/vehicule/{keyword}")
+    public List<MaintenanceDTO> getMaintenancesByVehicule(
+            @PathVariable Long keyword) {
+
+        return maintenanceService.findByVehiculeId(keyword);
+    }
+
 
 }

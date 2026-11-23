@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tn.esprit.autoloc.domain.Agence;
 import tn.esprit.autoloc.domain.Employe;
 import tn.esprit.autoloc.exception.ResourceNotFoundException;
-import tn.esprit.autoloc.mapper.EmployeMapper;
+import tn.esprit.autoloc.mapper.IMapper;
 import tn.esprit.autoloc.repository.IAgenceRepository;
 import tn.esprit.autoloc.repository.IEmployeRepository;
 import tn.esprit.autoloc.web.dto.EmployeDTO;
@@ -22,7 +22,7 @@ public class EmployeServiceImpl implements IEmployeService {
 
     private final IEmployeRepository employeRepository;
     private final IAgenceRepository agenceRepository;
-    private final EmployeMapper employeMapper;
+    private final IMapper mapper;
 
     // VALIDATION METIER EXISTANTE
     private void valider(Employe employe) {
@@ -46,7 +46,7 @@ public class EmployeServiceImpl implements IEmployeService {
             );
         }
 
-        Employe employe = employeMapper.toEntity(dto);
+        Employe employe = mapper.toEntity(dto);
 
         valider(employe);
 
@@ -62,7 +62,7 @@ public class EmployeServiceImpl implements IEmployeService {
 
         Employe nouvelEmploye = employeRepository.save(employe);
 
-        return employeMapper.toDTO(nouvelEmploye);
+        return mapper.toDTO(nouvelEmploye);
     }
 
     // GET BY ID
@@ -75,7 +75,7 @@ public class EmployeServiceImpl implements IEmployeService {
                         new ResourceNotFoundException("Employe", id)
                 );
 
-        return employeMapper.toDTO(employe);
+        return mapper.toDTO(employe);
     }
 
     // GET ALL
@@ -85,7 +85,7 @@ public class EmployeServiceImpl implements IEmployeService {
 
         return employeRepository.findAll()
                 .stream()
-                .map(employeMapper::toDTO)
+                .map(mapper::toDTO)
                 .toList();
     }
 
@@ -116,7 +116,7 @@ public class EmployeServiceImpl implements IEmployeService {
 
         Employe employeModifie = employeRepository.save(existant);
 
-        return employeMapper.toDTO(employeModifie);
+        return mapper.toDTO(employeModifie);
     }
 
     // DELETE

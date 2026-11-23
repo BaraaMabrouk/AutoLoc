@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import tn.esprit.autoloc.domain.Agence;
 import tn.esprit.autoloc.exception.ResourceNotFoundException;
-import tn.esprit.autoloc.mapper.AgenceMapper;
+import tn.esprit.autoloc.mapper.IMapper;
 import tn.esprit.autoloc.repository.IAgenceRepository;
 import tn.esprit.autoloc.web.dto.AgenceDTO;
 
@@ -19,7 +19,7 @@ import java.util.List;
 public class AgenceServiceImpl implements IAgenceService {
 
     private final IAgenceRepository agenceRepository;
-    private final AgenceMapper agenceMapper;
+    private final IMapper mapper;
 
     @Override
     public AgenceDTO create(AgenceDTO dto) {
@@ -30,11 +30,11 @@ public class AgenceServiceImpl implements IAgenceService {
             );
         }
 
-        Agence agence = agenceMapper.toEntity(dto);
+        Agence agence = mapper.toEntity(dto);
 
         Agence nouvelleAgence = agenceRepository.save(agence);
 
-        return agenceMapper.toDTO(nouvelleAgence);
+        return mapper.toDTO(nouvelleAgence);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class AgenceServiceImpl implements IAgenceService {
                         new ResourceNotFoundException("Agence", id)
                 );
 
-        return agenceMapper.toDTO(agence);
+        return mapper.toDTO(agence);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class AgenceServiceImpl implements IAgenceService {
 
         return agenceRepository.findAll()
                 .stream()
-                .map(agenceMapper::toDTO)
+                .map(mapper::toDTO)
                 .toList();
     }
 
@@ -74,7 +74,7 @@ public class AgenceServiceImpl implements IAgenceService {
 
         Agence agenceModifiee = agenceRepository.save(existante);
 
-        return agenceMapper.toDTO(agenceModifiee);
+        return mapper.toDTO(agenceModifiee);
     }
 
     @Override

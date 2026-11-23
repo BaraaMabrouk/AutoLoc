@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tn.esprit.autoloc.domain.Contrat;
 import tn.esprit.autoloc.domain.Reservation;
 import tn.esprit.autoloc.exception.ResourceNotFoundException;
-import tn.esprit.autoloc.mapper.ContratMapper;
+import tn.esprit.autoloc.mapper.IMapper;
 import tn.esprit.autoloc.repository.IContratRepository;
 import tn.esprit.autoloc.repository.IReservationRepository;
 import tn.esprit.autoloc.web.dto.ContratDTO;
@@ -23,7 +23,7 @@ public class ContratServiceImpl implements IContratService {
 
     private final IContratRepository contratRepository;
     private final IReservationRepository reservationRepository;
-    private final ContratMapper contratMapper;
+    private final IMapper mapper;
 
     // VALIDATION METIER EXISTANTE
     private void valider(Contrat contrat) {
@@ -48,7 +48,7 @@ public class ContratServiceImpl implements IContratService {
             );
         }
 
-        Contrat contrat = contratMapper.toEntity(dto);
+        Contrat contrat = mapper.toEntity(dto);
 
         valider(contrat);
 
@@ -68,7 +68,7 @@ public class ContratServiceImpl implements IContratService {
 
         Contrat nouveauContrat = contratRepository.save(contrat);
 
-        return contratMapper.toDTO(nouveauContrat);
+        return mapper.toDTO(nouveauContrat);
     }
 
     // GET BY ID
@@ -81,7 +81,7 @@ public class ContratServiceImpl implements IContratService {
                         new ResourceNotFoundException("Contrat", id)
                 );
 
-        return contratMapper.toDTO(contrat);
+        return mapper.toDTO(contrat);
     }
 
     // GET ALL
@@ -91,7 +91,7 @@ public class ContratServiceImpl implements IContratService {
 
         return contratRepository.findAll()
                 .stream()
-                .map(contratMapper::toDTO)
+                .map(mapper::toDTO)
                 .toList();
     }
 
@@ -126,7 +126,7 @@ public class ContratServiceImpl implements IContratService {
 
         Contrat contratModifie = contratRepository.save(existant);
 
-        return contratMapper.toDTO(contratModifie);
+        return mapper.toDTO(contratModifie);
     }
 
     // DELETE
@@ -139,4 +139,15 @@ public class ContratServiceImpl implements IContratService {
 
         contratRepository.deleteById(id);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ContratDTO> findByVehiculeId(Long keyword) {
+
+        return contratRepository.findByReservationVehiculeIdVehicule(keyword)
+                .stream()
+                .map(mapper::toDTO)
+                .toList();
+    }
+
 }

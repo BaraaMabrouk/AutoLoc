@@ -1,3 +1,4 @@
+
 package tn.esprit.autoloc.service;
 
 import lombok.RequiredArgsConstructor;
@@ -7,11 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 import tn.esprit.autoloc.domain.Maintenance;
 import tn.esprit.autoloc.domain.Vehicule;
 import tn.esprit.autoloc.exception.ResourceNotFoundException;
-import tn.esprit.autoloc.mapper.MaintenanceMapper;
+import tn.esprit.autoloc.mapper.IMapper;
 import tn.esprit.autoloc.repository.IMaintenanceRepository;
 import tn.esprit.autoloc.repository.IVehiculeRepository;
 import tn.esprit.autoloc.web.dto.MaintenanceDTO;
-import tn.esprit.autoloc.web.dto.AffectationMaintenanceDTO;
 
 import java.util.List;
 
@@ -20,9 +20,12 @@ import java.util.List;
 @Transactional
 public class MaintenanceServiceImpl implements IMaintenanceService {
 
+    private static final String MAINTENANCE = "Maintenance";
+    private static final String VEHICULE = "Vehicule";
+
     private final IMaintenanceRepository maintenanceRepository;
     private final IVehiculeRepository vehiculeRepository;
-    private final MaintenanceMapper maintenanceMapper;
+    private final IMapper mapper;
 
     private void valider(Maintenance maintenance) {
         if (maintenance.getDateDebut() != null
@@ -42,19 +45,19 @@ public class MaintenanceServiceImpl implements IMaintenanceService {
                     "L'identifiant doit être nul");
         }
 
-        Maintenance maintenance = maintenanceMapper.toEntity(dto);
+        Maintenance maintenance = mapper.toEntity(dto);
 
         valider(maintenance);
 
         if (dto.idVehicule() != null) {
             Vehicule vehicule = vehiculeRepository.findById(dto.idVehicule())
                     .orElseThrow(() -> new ResourceNotFoundException(
-                            "Vehicule", dto.idVehicule()));
+                            VEHICULE, dto.idVehicule()));
 
             maintenance.setVehicule(vehicule);
         }
 
-        return maintenanceMapper.toDTO(
+        return mapper.toDTO(
                 maintenanceRepository.save(maintenance));
     }
 
@@ -64,9 +67,9 @@ public class MaintenanceServiceImpl implements IMaintenanceService {
 
         Maintenance maintenance = maintenanceRepository.findById(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Maintenance", id));
+                        new ResourceNotFoundException(MAINTENANCE, id));
 
-        return maintenanceMapper.toDTO(maintenance);
+        return mapper.toDTO(maintenance);
     }
 
     @Override
@@ -75,7 +78,7 @@ public class MaintenanceServiceImpl implements IMaintenanceService {
 
         return maintenanceRepository.findAll()
                 .stream()
-                .map(maintenanceMapper::toDTO)
+                .map(mapper::toDTO)
                 .toList();
     }
 
@@ -84,7 +87,7 @@ public class MaintenanceServiceImpl implements IMaintenanceService {
 
         Maintenance existante = maintenanceRepository.findById(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Maintenance", id));
+                        new ResourceNotFoundException(MAINTENANCE, id));
 
         existante.setDateDebut(dto.dateDebut());
         existante.setDateFin(dto.dateFin());
@@ -95,12 +98,12 @@ public class MaintenanceServiceImpl implements IMaintenanceService {
         if (dto.idVehicule() != null) {
             Vehicule vehicule = vehiculeRepository.findById(dto.idVehicule())
                     .orElseThrow(() -> new ResourceNotFoundException(
-                            "Vehicule", dto.idVehicule()));
+                            VEHICULE, dto.idVehicule()));
 
             existante.setVehicule(vehicule);
         }
 
-        return maintenanceMapper.toDTO(
+        return mapper.toDTO(
                 maintenanceRepository.save(existante));
     }
 
@@ -108,7 +111,7 @@ public class MaintenanceServiceImpl implements IMaintenanceService {
     public void deleteById(Long id) {
 
         if (!maintenanceRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Maintenance", id);
+            throw new ResourceNotFoundException(MAINTENANCE, id);
         }
 
         maintenanceRepository.deleteById(id);
@@ -117,35 +120,35 @@ public class MaintenanceServiceImpl implements IMaintenanceService {
     @Override
     public MaintenanceDTO affecterMaintenanceVehicule(
             Long idMaintenance,
-            AffectationMaintenanceDTO dto) {
+            Long idVehicule) {
 
-        // 1. Rechercher la maintenance
         Maintenance maintenance = maintenanceRepository
                 .findById(idMaintenance)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Maintenance", idMaintenance
-                        )
-                );
+                                MAINTENANCE, idMaintenance));
 
-        // 2. Rechercher le véhicule
         Vehicule vehicule = vehiculeRepository
-                .findById(dto.idVehicule())
+                .findById(idVehicule)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Vehicule", dto.idVehicule()
-                        )
-                );
+                                VEHICULE, idVehicule));
 
-        // 3. Affecter le véhicule à la maintenance
         maintenance.setVehicule(vehicule);
 
-        // 4. Enregistrer l'affectation
         Maintenance maintenanceModifiee =
                 maintenanceRepository.save(maintenance);
 
-        // 5. Retourner un DTO
-        return maintenanceMapper.toDTO(maintenanceModifiee);
+        return mapper.toDTO(maintenanceModifiee);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<MaintenanceDTO> findByVehiculeId(Long keyword) {
+
+        return maintenanceRepository.findByVehiculeIdVehicule(keyword)
+                .stream()
+                .map(mapper::toDTO)
+                .toList();
+    }
 }

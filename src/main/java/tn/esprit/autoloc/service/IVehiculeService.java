@@ -2,12 +2,13 @@
 package tn.esprit.autoloc.service;
 
 import tn.esprit.autoloc.web.dto.VehiculeDTO;
-import tn.esprit.autoloc.web.dto.AffectationEquipementDTO;
-import tn.esprit.autoloc.web.dto.AffectationEquipementResponseDTO;
-
 import java.util.List;
 
 public interface IVehiculeService {
+
+    List<VehiculeDTO> findByContratId(Long keyword);
+
+    List<VehiculeDTO> findByMaintenanceId(Long keyword);
 
     VehiculeDTO create(VehiculeDTO dto);
 
@@ -19,15 +20,25 @@ public interface IVehiculeService {
 
     void deleteById(Long id);
 
-    // Affectation existante : Vehicule -> Agence
+    // Affectation Véhicule -> Equipement
+    VehiculeDTO affecterVehiculeEquipement(
+            Long idVehicule,
+            Long idEquipement
+    );
+
+
+
+
+
+
+
+
+
+
+
+    // Affectation Véhicule -> Agence
     VehiculeDTO affecterVehiculeAgence(
             Long idVehicule,
             Long idAgence
-    );
-
-    // Nouvelle affectation : Vehicule -> Equipement
-    AffectationEquipementResponseDTO affecterVehiculeEquipement(
-            Long idVehicule,
-            AffectationEquipementDTO dto
     );
 }
