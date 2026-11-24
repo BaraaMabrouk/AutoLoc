@@ -207,10 +207,8 @@ public class VehiculeServiceImpl implements IVehiculeService {
     @Transactional(readOnly = true)
     public List<VehiculeDTO> findByContratId(Long keyword) {
 
-        return vehiculeRepository.findByReservationsContratIdContrat(keyword)
-                .stream()
-                .map(mapper::toDTO)
-                .toList();
+        return vehiculeRepository
+                .findByReservationsContratIdContrat(keyword);
     }
 
     // ATELIER 7 : VEHICULES PAR ID MAINTENANCE
@@ -218,9 +216,7 @@ public class VehiculeServiceImpl implements IVehiculeService {
     @Transactional(readOnly = true)
     public List<VehiculeDTO> findByMaintenanceId(Long keyword) {
 
-        return vehiculeRepository.findByMaintenancesIdMaintenance(keyword)
-                .stream()
-                .map(mapper::toDTO)
-                .toList();
+        return vehiculeRepository
+                .findByMaintenancesIdMaintenance(keyword);
     }
 }

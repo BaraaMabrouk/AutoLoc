@@ -146,9 +146,6 @@ public class MaintenanceServiceImpl implements IMaintenanceService {
     @Transactional(readOnly = true)
     public List<MaintenanceDTO> findByVehiculeId(Long keyword) {
 
-        return maintenanceRepository.findByVehiculeIdVehicule(keyword)
-                .stream()
-                .map(mapper::toDTO)
-                .toList();
+        return maintenanceRepository.findByVehiculeIdVehicule(keyword);
     }
 }
