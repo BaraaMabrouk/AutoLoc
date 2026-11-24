@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import tn.esprit.autoloc.service.IContratService;
 import tn.esprit.autoloc.web.dto.ContratDTO;
+import tn.esprit.autoloc.web.dto.ContratRechercheDTO;
 
 import java.util.List;
 
@@ -102,7 +103,7 @@ public class ContratController {
 
 
     @GetMapping("/vehicule/{keyword}")
-    public List<ContratDTO> getContratsByVehicule(
+    public List<ContratRechercheDTO> getContratsByVehicule(
             @PathVariable Long keyword) {
 
         return contratService.findByVehiculeId(keyword);

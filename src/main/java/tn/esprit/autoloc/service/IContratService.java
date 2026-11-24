@@ -2,12 +2,13 @@
 package tn.esprit.autoloc.service;
 
 import tn.esprit.autoloc.web.dto.ContratDTO;
+import tn.esprit.autoloc.web.dto.ContratRechercheDTO;
 
 import java.util.List;
 
 public interface IContratService {
 
-    List<ContratDTO> findByVehiculeId(Long keyword);
+    List<ContratRechercheDTO> findByVehiculeId(Long keyword);
 
     ContratDTO create(ContratDTO dto);
 

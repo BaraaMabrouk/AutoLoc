@@ -12,6 +12,7 @@ import tn.esprit.autoloc.mapper.IMapper;
 import tn.esprit.autoloc.repository.IContratRepository;
 import tn.esprit.autoloc.repository.IReservationRepository;
 import tn.esprit.autoloc.web.dto.ContratDTO;
+import tn.esprit.autoloc.web.dto.ContratRechercheDTO;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -142,12 +143,9 @@ public class ContratServiceImpl implements IContratService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ContratDTO> findByVehiculeId(Long keyword) {
+    public List<ContratRechercheDTO> findByVehiculeId(Long keyword) {
 
-        return contratRepository.findByReservationVehiculeIdVehicule(keyword)
-                .stream()
-                .map(mapper::toDTO)
-                .toList();
+        return contratRepository.findByReservationVehiculeIdVehicule(keyword);
     }
 
 }
